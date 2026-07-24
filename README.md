@@ -174,11 +174,6 @@ dist/KoboRoot.tgz
 
 安裝包不會包含實際的 `HsKobo.sqlite`、logs 或其他使用者資料。
 
-## GitHub Release
-
-推送 `v*` tag 後，GitHub Actions 會執行 `./build.sh`、建立同名 Release，並
-上傳 `dist/KoboRoot.tgz`。
-
 ```sh
 git tag v1.0.0
 git push origin v1.0.0
