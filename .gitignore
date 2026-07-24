@@ -1,0 +1,4 @@
+.DS_Store
+dist/
+*.sqlite-shm
+*.sqlite-wal

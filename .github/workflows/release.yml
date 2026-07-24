@@ -1,0 +1,31 @@
+name: Build and release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+
+      - name: Build KoboRoot.tgz
+        shell: bash
+        run: ./build.sh
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            "dist/KoboRoot.tgz" \
+            --verify-tag \
+            --generate-notes \
+            --title "${GITHUB_REF_NAME}"

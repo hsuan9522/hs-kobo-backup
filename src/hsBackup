@@ -1,0 +1,2 @@
+menu_item   :main   :備份 Kobo 資料   :cmd_spawn   :quiet:/mnt/onboard/.adds/nickel-hs/backup/runBackup.sh
+chain_failure   :dbg_msg   :無法啟動 Kobo 備份，請檢查 .adds/nickel-hs/logs/hs-kobo-backup.log
