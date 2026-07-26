@@ -19,3 +19,8 @@ showFailure() {
 trap showFailure EXIT
 
 "$BACKUP_DIR/sync.sh" all
+
+echo "=== HS Kobo Backup completed: $(date) ==="
+if command -v fbink >/dev/null 2>&1; then
+    fbink -qpm -y -2 "HS Kobo Backup completed."
+fi
