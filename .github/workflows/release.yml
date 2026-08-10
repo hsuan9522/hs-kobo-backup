@@ -4,12 +4,19 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      backup_tag:
+        description: Existing hs-kobo-backup release tag to send to Calendar
+        required: true
+        type: string
 
 permissions:
   contents: write
 
 jobs:
   release:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
 
     steps:
@@ -30,12 +37,51 @@ jobs:
             --generate-notes \
             --title "${GITHUB_REF_NAME}"
 
+  trigger-calendar:
+    needs: release
+    if: >-
+      always() &&
+      (needs.release.result == 'success' || needs.release.result == 'skipped')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Resolve hs-kobo-backup tag
+        id: backup
+        shell: bash
+        env:
+          MANUAL_BACKUP_TAG: ${{ inputs.backup_tag }}
+        run: |
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+            backup_tag="${MANUAL_BACKUP_TAG}"
+          else
+            backup_tag="${GITHUB_REF_NAME}"
+          fi
+
+          if [[ ! "${backup_tag}" =~ ^v[0-9]+(\.[0-9]+)*$ ]]; then
+            echo "Invalid hs-kobo-backup tag: ${backup_tag}" >&2
+            exit 1
+          fi
+
+          echo "tag=${backup_tag}" >> "${GITHUB_OUTPUT}"
+
+      - name: Verify GitHub Release exists
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BACKUP_TAG: ${{ steps.backup.outputs.tag }}
+        run: gh release view "${BACKUP_TAG}" --repo "${GITHUB_REPOSITORY}" >/dev/null
+
       - name: Trigger kobo-reading-calendar release
         env:
           GH_TOKEN: ${{ secrets.CALENDAR_RELEASE_TOKEN }}
+          BACKUP_TAG: ${{ steps.backup.outputs.tag }}
         run: |
+          if [[ -z "${GH_TOKEN}" ]]; then
+            echo "Missing Actions secret: CALENDAR_RELEASE_TOKEN" >&2
+            exit 1
+          fi
+
           gh api \
             --method POST \
             "repos/hsuan9522/kobo-reading-calendar/dispatches" \
             -f event_type=hs-kobo-backup-released \
-            -f "client_payload[backup_tag]=${GITHUB_REF_NAME}"
+            -f "client_payload[backup_tag]=${BACKUP_TAG}"

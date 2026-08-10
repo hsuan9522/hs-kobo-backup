@@ -174,3 +174,8 @@ hs-kobo-backup/
 `CALENDAR_RELEASE_TOKEN`。建議使用 fine-grained personal access token，並只授權
 `hsuan9522/kobo-reading-calendar` repository 的 **Contents: Read and write**。
 若未設定此 secret，Backup Release 仍會建立，但通知 Calendar 的步驟會失敗。
+
+Backup 建置發布與 Calendar 通知分屬兩個 jobs。若只有通知失敗，可以在該次
+Actions 執行頁面選擇 **Re-run failed jobs**，不會重複建立已存在的 Backup
+Release。也可以從 **Actions → Build and release → Run workflow** 手動輸入既有
+backup tag（例如 `v1.2.0`）補送通知；workflow 會先確認該 Release 確實存在。
