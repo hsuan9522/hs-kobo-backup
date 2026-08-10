@@ -29,3 +29,13 @@ jobs:
             --verify-tag \
             --generate-notes \
             --title "${GITHUB_REF_NAME}"
+
+      - name: Trigger kobo-reading-calendar release
+        env:
+          GH_TOKEN: ${{ secrets.CALENDAR_RELEASE_TOKEN }}
+        run: |
+          gh api \
+            --method POST \
+            "repos/hsuan9522/kobo-reading-calendar/dispatches" \
+            -f event_type=hs-kobo-backup-released \
+            -f "client_payload[backup_tag]=${GITHUB_REF_NAME}"

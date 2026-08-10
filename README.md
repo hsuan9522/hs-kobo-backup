@@ -160,3 +160,17 @@ hs-kobo-backup/
 - `vendor/`：Kobo ARM 平台使用的 SQLite executable 與 shared library。
 - `build.sh`：組合上述檔案並產生安裝包。
 
+## Release 與 Reading Calendar 連動
+
+推送 `v*` tag 後，GitHub Actions 會建立 HS Kobo Backup Release。Release
+成功後，workflow 會將這次的 backup tag 傳給 `kobo-reading-calendar`，由後者：
+
+1. 使用指定的 backup tag 建置整合安裝包。
+2. 更新 Calendar repository 的 `HS_KOBO_BACKUP_VERSION` 並建立相依更新 commit。
+3. 將 Calendar 最新版本的 patch 加一，例如 `v3.0` 變成 `v3.0.1`。
+4. 建置成功後建立 Calendar tag 與 Release。
+
+需要在本 repository 的 **Settings → Secrets and variables → Actions** 新增
+`CALENDAR_RELEASE_TOKEN`。建議使用 fine-grained personal access token，並只授權
+`hsuan9522/kobo-reading-calendar` repository 的 **Contents: Read and write**。
+若未設定此 secret，Backup Release 仍會建立，但通知 Calendar 的步驟會失敗。
