@@ -98,7 +98,7 @@ SELECT
     t1.Timestamp,
     t1.Attributes,
     t1.Metrics,
-    strftime('%Y-%m-%d', datetime(t1.Timestamp, '+08:00')) AS Date,
+    strftime('%Y-%m-%d', datetime(t1.Timestamp, 'localtime')) AS Date,
     COALESCE(json_extract(t1.Attributes, '$.title'), t2.Title) AS Title,
     COALESCE(json_extract(t1.Attributes, '$.author'), t2.Author) AS Author,
     json_extract(t1.Metrics, '$.SecondsRead') AS ReadingTime
