@@ -4,6 +4,7 @@ set -eu
 PROJECT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 OUTPUT_DIR="$PROJECT_DIR/dist"
 STAGING_DIR=$(mktemp -d)
+PACKAGE_VERSION=${PACKAGE_VERSION:-$(git -C "$PROJECT_DIR" describe --tags --exact-match 2>/dev/null || printf 'dev')}
 
 cleanup() {
     rm -rf "$STAGING_DIR"
@@ -21,6 +22,7 @@ if [ ! -f "$PROJECT_DIR/vendor/lib/libsqlite3.so.0" ]; then
 fi
 
 mkdir -p "$NM_DIR" "$BACKUP_DIR" "$NICKEL_HS_DIR/lib" "$OUTPUT_DIR"
+printf '%s\n' "$PACKAGE_VERSION" > "$BACKUP_DIR/VERSION"
 
 cp -p "$PROJECT_DIR/src/hsBackup" "$NM_DIR/"
 

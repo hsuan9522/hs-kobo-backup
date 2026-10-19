@@ -24,6 +24,8 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Build KoboRoot.tgz
+        env:
+          PACKAGE_VERSION: ${{ github.ref_name }}
         shell: bash
         run: ./build.sh
 
